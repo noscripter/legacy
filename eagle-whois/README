@@ -1,0 +1,61 @@
+                        888         
+                        888         
+                        888         
+ .d88b.  8888b.  .d88b. 888 .d88b.  
+d8P  Y8b    "88bd88P"88b888d8P  Y8b 
+88888888.d888888888  88888888888888 
+Y8b.    888  888Y88b 888888Y8b.     
+ "Y8888 "Y888888 "Y88888888 "Y8888  
+                     888            
+                Y8b d88P            
+                 "Y88P"      
+eagle - A modern whois client in C
+------------------------------------
+
+News
+-----
+	* (09-09-2015 ) eagle 1.0 released!
+	* This is the end of the development, The goal was version 1.0!
+	* you can send pull requests for bugs/improve the code only.
+
+What is eagle?
+--------------
+eagle or eagle-whois is a modern whois client.
+
+build
+--------
+
+make
+
+Build with GeoIP support
+-------------------------
+
+make geoip 
+
+install
+----------
+
+sudo make install && eagle -h
+
+Usage
+-----
+
+eagle [host] [OPTIONS]
+eagle domain.foo -n
+eagle domain.foo -i
+eagle domain.foo -s whois.server.foo
+eagle 127.0.0.1 -n
+eagle 127.0.0.1 -g
+
+run: eagle -h for the full options.
+
+Copying
+-------
+
+Copyright (c) 2015 by Hypsurus.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>.
+
+
+
+
+

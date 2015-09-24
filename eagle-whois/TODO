@@ -1,0 +1,16 @@
+
+eagle-Whois TODO file.
+----------------------
+
+for release v1.0
+-----------------
+
+* [DONE 50%] fix known and unknown bugs.
+* [DONE 100%] getting the geoip function to support GeoIP API.
+* [DONE 60%] add clolord output function.
+* build pakages for debian/archlinux/fedora
+
+done
+-----
+*  fix known bugs.
+* getting the geoip function to support GeoIP API

@@ -1,0 +1,128 @@
+diff -rupN transmission-2.84/cli/cli.c transmission/cli/cli.c
+--- transmission-2.84/cli/cli.c	2014-07-01 20:10:43.482913163 +0300
++++ transmission/cli/cli.c	2015-09-24 08:57:48.810997789 +0300
+@@ -62,10 +62,27 @@
+ ****
+ ***/
+ 
++/* Patch_awesome */
++#define RED "\e[31m"
++#define YELLOW "\e[33m"
++#define BLUE "\e[1;34m"
++#define GREEN "\e[32m"
++#define END "\e[0m"
++
++
+ #define LINEWIDTH 80
+ #define MY_CONFIG_NAME "transmission"
+ #define MY_READABLE_NAME "transmission-cli"
+ 
++char ascii_logo[] = 
++"\033[01;34m"
++"----------------------------------------------------------------\n"
++"| @@@@@@@  @@@@@@  @@@@@@@  @@@@@@@  @@@@@@@@ @@@  @@@ @@@@@@@  |\n"
++"|   @@!   @@!  @@@ @@!  @@@ @@!  @@@ @@!      @@!@!@@@   @@!    |\n"
++"|   @!!   @!@  !@! @!@!!@!  @!@!!@!  @!!!:!   @!@@!!@!   @!!    |\n"
++"|   !!:   !!:  !!! !!: :!!  !!: :!!  !!:      !!:  !!!   !!:    |\n"
++"|    :     : :. :   :   : :  :   : : : :: ::: ::    :     :     |\n";
++
+ static bool showVersion              = false;
+ static bool verify                   = false;
+ static sig_atomic_t gotsig           = false;
+@@ -147,12 +164,12 @@ getStatusStr (const tr_stat * st,
+ {
+   if (st->activity == TR_STATUS_CHECK_WAIT)
+     {
+-      tr_snprintf (buf, buflen, "Waiting to verify local files");
++      tr_snprintf (buf, buflen, ":: Waiting to verify local files");
+     }
+   else if (st->activity == TR_STATUS_CHECK)
+     {
+       tr_snprintf (buf, buflen,
+-                   "Verifying local files (%.2f%%, %.2f%% valid)",
++                   ":: Verifying local files (%.2f%%, %.2f%% valid)",
+                    tr_truncd (100 * st->recheckProgress, 2),
+                    tr_truncd (100 * st->percentDone, 2));
+     }
+@@ -167,7 +184,7 @@ getStatusStr (const tr_stat * st,
+       tr_strlratio (ratioStr, st->ratio, sizeof (ratioStr));
+ 
+       tr_snprintf (buf, buflen,
+-                   "Progress: %.1f%%, "
++                   ":: Progress: %.1f%%, "
+                    "dl from %d of %d peers (%s), "
+                    "ul to %d (%s) "
+                    "[%s]",
+@@ -175,7 +192,7 @@ getStatusStr (const tr_stat * st,
+                    st->peersSendingToUs, st->peersConnected, dnStr,
+                    st->peersGettingFromUs, upStr,
+                    ratioStr);
+-    }
++  }
+   else if (st->activity == TR_STATUS_SEED)
+     {
+       char upStr[80];
+@@ -185,8 +202,8 @@ getStatusStr (const tr_stat * st,
+       tr_strlratio (ratioStr, st->ratio, sizeof (ratioStr));
+ 
+       tr_snprintf (buf, buflen,
+-                   "Seeding, uploading to %d of %d peer(s), %s [%s]",
+-                   st->peersGettingFromUs, st->peersConnected, upStr, ratioStr);
++                   "%sSeeding, uploading to %d of %d peer(s), %s [%s]%s",RED,
++                   st->peersGettingFromUs, st->peersConnected, upStr, ratioStr,END);
+     }
+   else
+     {
+@@ -230,13 +247,12 @@ main (int argc, char ** argv)
+   uint8_t     * fileContents;
+   size_t        fileLength;
+   const char  * str;
++  char *filename;
+ 
+   tr_formatter_mem_init (MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
+   tr_formatter_size_init (DISK_K,DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
+   tr_formatter_speed_init (SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+ 
+-  printf ("%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING);
+-
+   /* user needs to pass in at least one argument */
+   if (argc < 2)
+     {
+@@ -249,6 +265,9 @@ main (int argc, char ** argv)
+   configDir = getConfigDir (argc, (const char**)argv);
+   tr_sessionLoadSettings (&settings, configDir, MY_CONFIG_NAME);
+ 
++	/* Set message level to 0  */
++  tr_variantDictAddInt (&settings, TR_KEY_message_level, 0);
++
+   /* the command line overrides defaults */
+   if (parseCommandLine (&settings, argc, (const char**)argv))
+     return EXIT_FAILURE;
+@@ -330,7 +349,14 @@ main (int argc, char ** argv)
+       tr_torrentVerify (tor, NULL, NULL);
+     }
+ 
+-  for (;;)
++	filename = (strrchr(torrentPath, '/'))+1;
++	/* ascii logo */
++	printf("%s", ascii_logo);
++	printf("| \t\t%s-%s \t\t\t|\n", MY_READABLE_NAME, LONG_VERSION_STRING);
++  printf("---------------------------------------------------------------\n\n\033[00m");
++  printf("%s:: %s%s\n", GREEN, filename, END);
++
++	for (;;)
+     {
+       char  line[LINEWIDTH];
+       const tr_stat * st;
+@@ -343,8 +369,10 @@ main (int argc, char ** argv)
+       if (gotsig)
+         {
+           gotsig = false;
+-          printf ("\nStopping torrent...\n");
++          printf ("%s\n::Stopping torrent...\n%s",RED,END);
+           tr_torrentStop (tor);
++					/* To avoid (core dump) when pressing ctrl+c */
++					tr_wait_msec (500);
+         }
+ 
+       if (manualUpdate)
