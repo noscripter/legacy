@@ -6,7 +6,6 @@ Legacy
 Welcome to legacy, 
 place for all of my personal patches, old stuff I found useful, and more.
 
-
 Legacy projects
 ================
 
@@ -25,6 +24,11 @@ Patches
 [!] Please compile transmission with `./configure --disable-nls`
 
 ![tr284](screenshots/transmission284.png)
+
+Want to thank me?
+=================
+
+Just star the repository :smiley:
 
 Copying
 ==========
